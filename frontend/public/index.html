@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário Lead</title>
+</head>
+<script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/3859664c-843e-4c1c-afd5-21270631755c-loader.js" ></script>
+<body>
+  <h1>Cadastro de Lead</h1>
+  <form id="leadForm">
+    <label>Nome:</label><br>
+    <input type="text" name="nome" required><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
+
+    <label>Mensagem:</label><br>
+    <textarea name="mensagem"></textarea><br><br>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <div id="status"></div>
+
+  <script>
+    const form = document.getElementById('leadForm');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      status.textContent = "Enviando...";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const res = await fetch("/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          status.textContent = "✅ Lead enviado com sucesso!";
+          form.reset();
+        } else {
+          status.textContent = "❌ Erro: " + JSON.stringify(result.error);
+        }
+      } catch (err) {
+        status.textContent = "❌ Erro de conexão";
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
