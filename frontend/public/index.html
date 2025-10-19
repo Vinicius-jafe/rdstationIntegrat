@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Formulário Lead</title>
 </head>
-<script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/3859664c-843e-4c1c-afd5-21270631755c-loader.js" ></script>
 <body>
   <h1>Cadastro de Lead</h1>
   <form id="leadForm">
@@ -30,22 +29,31 @@
       e.preventDefault();
       status.textContent = "Enviando...";
 
-      const data = Object.fromEntries(new FormData(form).entries());
+      const data = {
+        email: form.email.value,
+        name: form.nome.value,
+        mensagem: form.mensagem.value,
+        // substitua pelo seu token do RD Station
+        token_rdstation: "SEU_TOKEN_RDSTATION",
+        // substitua pelo seu identificador de formulário
+        identificador_formulario: "SEU_IDENTIFICADOR"
+      };
 
       try {
-        const res = await fetch("/lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const res = await fetch('https://www.rdstation.com.br/api/1.3/conversions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify(data)
         });
-
-        const result = await res.json();
 
         if (res.ok) {
           status.textContent = "✅ Lead enviado com sucesso!";
           form.reset();
         } else {
-          status.textContent = "❌ Erro: " + JSON.stringify(result.error);
+          const err = await res.json();
+          status.textContent = "❌ Erro: " + JSON.stringify(err);
         }
       } catch (err) {
         status.textContent = "❌ Erro de conexão";
